@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Stores personalized settings and information for a user of the Hello Sunrise application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "customGreetingText": {
+          "type": "string",
+          "description": "The custom text set by the user to be displayed, potentially as a base for personalized greetings. (App feature: User Customization)"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "description": "The timestamp indicating when the user's profile information or custom settings were last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "customGreetingText",
+        "lastUpdated"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores personalized settings and information for a user. Each document is the UserProfile for the authenticated user, secured by `userId` matching `request.auth.uid`. Includes fields like `customGreetingText` for user customization.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user, matching request.auth.uid."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The recommended Firestore structure for 'Hello Sunrise' prioritizes Authorization Independence and Structural Segregation by placing each user's `UserProfile` document directly under their unique user ID within the top-level `users` collection. This results in paths like `/users/{userId}`. Each document at this path will contain the complete `UserProfile` data, including `customGreetingText` and `lastUpdated`.\n\nThis structure achieves **Authorization Independence** because the ownership of the `UserProfile` is inherently tied to the document's path. The document ID (`{userId}`) directly corresponds to the authenticated user's unique identifier (`request.auth.uid`). This eliminates the need for any `get()` operations in security rules to check parent documents or external roles, making rules simple, robust, and atomic. A user's profile can be created or updated without needing to fetch any other document to determine permissions.\n\n**Structural Segregation** is maintained as each `UserProfile` document is homogeneous in its security posture: it is entirely owned and modifiable only by the `userId` specified in its path. There are no mixed access levels or different types of data within this collection that would require complex conditional logic in security rules.\n\n**QAPs (Queries as Permissions)** are robustly supported. Since `UserProfile` is private to each user, direct `get` operations like `db.collection('users').doc(request.auth.uid).get()` are the primary access method. Security rules will simply enforce that `request.auth.uid == userId` for read, write, and update operations. Attempting to `list` (query) other users' profiles without explicit permission would fail by design, as the rules would prevent unauthorized access to documents where `userId` does not match `request.auth.uid`. This design ensures that security rules explicitly define what a user can access, rather than relying on rules to filter results from a broader query, which aligns perfectly with the QAPs principle."
+  }
+}

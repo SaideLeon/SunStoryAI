@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * STAGE: PROTOTYPING
+     * 
+     * CORE PHILOSOPHY:
+     * This ruleset enforces a strict user-ownership model designed for the "Hello Sunrise" application. 
+     * The primary goal is to ensure that personal data and settings remain private to the 
+     * authenticated user while maintaining high performance by avoiding cross-document lookups.
+     *
+     * DATA STRUCTURE:
+     * All user-specific data is stored at the top-level `/users/{userId}` path. This flat 
+     * hierarchy ensures that authorization is inherently tied to the document path, fulfilling 
+     * the principle of Authorization Independence.
+     *
+     * KEY SECURITY DECISIONS:
+     * 1. Strict Ownership: Users can only read, list, or write to their own profile document.
+     * 2. No Public Discovery: Listing the 'users' collection is restricted to the individual owner. 
+     *    This prevents user enumeration or privacy leaks.
+     * 3. Relational Integrity: On creation, the rules enforce that the internal 'id' field 
+     *    of the UserProfile matches the document's ID (the user's UID).
+     * 4. Field Immutability: The 'id' field of a UserProfile is made immutable after creation 
+     *    to prevent ownership hijacking or data corruption.
+     */
+
+    // --- Helper Functions ---
+
+    /**
+     * @description Checks if the request is made by an authenticated user.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user's UID matches the provided userId.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the document exists and the requester is the owner.
+     * Used for state-changing operations (update, delete).
+     */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for the UserProfile entity, storing personalized settings.
+     * @path /users/{userId}
+     * @allow (get) If the user's UID matches the {userId} in the path.
+     * @allow (create) If the user's UID matches {userId} and the data 'id' field matches the UID.
+     * @deny (list) If a user tries to list all user profiles or a profile that isn't theirs.
+     * @principle Restricts access to a user's own data tree and validates path consistency.
+     */
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+      
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      
+      allow delete: if isExistingOwner(userId);
+    }
+
+  }
+}
