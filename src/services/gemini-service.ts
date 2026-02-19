@@ -23,7 +23,7 @@ export const generateSpeech = async (
 
 export const generateStoryboard = async (fullText: string, apiKey?: string): Promise<StoryboardSegment[]> => {
   const genAI = getClient(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
   
   const prompt = `Você é um diretor de storyboard. Divida a história em cenas granulares. Crie uma cena para CADA frase. Gere prompts visuais cinematográficos em formato 9:16. Responda em JSON válido: [{"narrativeText": "...", "imagePrompt": "..."}]`;
   
