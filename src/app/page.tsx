@@ -72,6 +72,7 @@ export default function App() {
   // Auth State
   const [user, setUser] = useState<any>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
   // Audio State
   const [selectedVoice, setSelectedVoice] = useState<VoiceName>(VoiceName.Fenrir);
@@ -258,6 +259,7 @@ export default function App() {
 
   const checkAuth = () => {
     if (!user) {
+      setAuthMode('login');
       setShowAuthModal(true);
       setError('Faça login para acessar esta função.');
       return false;
@@ -269,6 +271,17 @@ export default function App() {
     if (checkAuth()) {
       setShowLanding(false);
     }
+  };
+
+
+  const openLoginModal = () => {
+    setAuthMode('login');
+    setShowAuthModal(true);
+  };
+
+  const openRegisterModal = () => {
+    setAuthMode('register');
+    setShowAuthModal(true);
   };
 
   const openHistory = () => {
@@ -578,12 +591,30 @@ export default function App() {
   };
 
   if (showLanding) {
-    return <LandingPage onEnter={enterStudio} />;
+    return (
+      <>
+        <LandingPage onEnterStudio={enterStudio} onLogin={openLoginModal} onRegister={openRegisterModal} />
+        <AuthModal
+          isOpen={showAuthModal}
+          mode={authMode}
+          onClose={() => setShowAuthModal(false)}
+          onSuccess={(loggedUser) => {
+            setUser(loggedUser);
+            setShowLanding(false);
+          }}
+        />
+      </>
+    );
   }
 
   return (
     <div className="h-screen flex flex-col bg-[--bg-base] text-[--text-main] overflow-hidden">
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} onSuccess={(user) => setUser(user)} />
+      <AuthModal
+        isOpen={showAuthModal}
+        mode={authMode}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={(loggedUser) => setUser(loggedUser)}
+      />
       <ProjectHistoryModal 
         isOpen={showHistory} 
         onClose={() => setShowHistory(false)} 
@@ -616,7 +647,7 @@ export default function App() {
                       <button onClick={handleSignOut} className="text-red-400"><LogOut size={16} /></button>
                     </div>
                   ) : (
-                    <button onClick={() => setShowAuthModal(true)} className="w-full py-2 border border-[--accent] text-[--accent] font-mono text-xs uppercase">Entrar</button>
+                    <button onClick={openLoginModal} className="w-full py-2 border border-[--accent] text-[--accent] font-mono text-xs uppercase">Entrar</button>
                   )}
                 </div>
                 <div className="space-y-4">

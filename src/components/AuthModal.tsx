@@ -1,22 +1,29 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '@/services/supabaseClient';
 import { X, Mail, Lock, Loader2, ArrowRight, UserPlus, LogIn, AlertCircle } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
+  mode?: 'login' | 'register';
   onClose: () => void;
   onSuccess: (user: any) => void;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
-  const [isLogin, setIsLogin] = useState(true);
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, mode = 'login', onClose, onSuccess }) => {
+  const [isLogin, setIsLogin] = useState(mode === 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    if (isOpen) {
+      setIsLogin(mode === 'login');
+      setError(null);
+    }
+  }, [isOpen, mode]);
 
   if (!isOpen) return null;
 

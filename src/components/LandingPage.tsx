@@ -14,7 +14,9 @@ import {
 } from 'lucide-react';
 
 interface LandingPageProps {
-  onEnter: () => void;
+  onEnterStudio: () => void;
+  onLogin: () => void;
+  onRegister: () => void;
 }
 
 const floatingOrbs = [
@@ -41,7 +43,7 @@ const highlights = [
   },
 ];
 
-const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onRegister }) => {
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
@@ -79,13 +81,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
             IA para creators de conteúdo
           </div>
           <button
-            onClick={onEnter}
+            onClick={onLogin}
             className="px-4 py-2 border border-fine text-[10px] font-mono uppercase tracking-widest text-[#d0d0d0] hover:bg-[#1a1a1a] transition-colors"
           >
             Login
           </button>
           <button
-            onClick={onEnter}
+            onClick={onRegister}
             className="px-4 py-2 bg-[--accent] text-black text-[10px] font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all"
           >
             Registro
@@ -135,7 +137,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
         </div>
 
         <button
-          onClick={onEnter}
+          onClick={onEnterStudio}
           className="group relative px-8 py-4 bg-[--accent] text-black font-mono text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all"
         >
           Entrar no Estúdio{' '}
