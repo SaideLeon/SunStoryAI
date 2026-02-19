@@ -259,9 +259,16 @@ export default function App() {
   const checkAuth = () => {
     if (!user) {
       setShowAuthModal(true);
+      setError('Faça login para acessar esta função.');
       return false;
     }
     return true;
+  };
+
+  const enterStudio = () => {
+    if (checkAuth()) {
+      setShowLanding(false);
+    }
   };
 
   const openHistory = () => {
@@ -286,6 +293,7 @@ export default function App() {
   }, []);
 
   const handleGenerateAudio = async () => {
+    if (!checkAuth()) return;
     if (!text.trim()) return;
     setIsGeneratingAudio(true);
     setError(null);
@@ -315,6 +323,7 @@ export default function App() {
   };
 
   const handleDownloadMainAudio = () => {
+    if (!checkAuth()) return;
     if (!audioBase64) return;
     const pcmData = decodeBase64(audioBase64);
     const wavBlob = pcmToWav(pcmData);
@@ -329,6 +338,7 @@ export default function App() {
   };
 
   const handleGenerateStoryboard = async () => {
+    if (!checkAuth()) return;
     if (!text.trim()) return;
     setIsGeneratingStoryboard(true);
     setError(null);
@@ -346,6 +356,7 @@ export default function App() {
   };
 
   const handleGenerateDramaticScript = async () => {
+    if (!checkAuth()) return;
     if (!scriptTopic.trim()) return;
     setIsGeneratingScript(true);
     setError(null);
@@ -363,6 +374,7 @@ export default function App() {
   };
 
   const handleGenerateSegmentAudio = async (index: number, narrativeText: string) => {
+    if (!checkAuth()) return;
     if (generatingAudioIndices.includes(index)) return;
     setGeneratingAudioIndices(prev => [...prev, index]);
     setError(null);
@@ -390,6 +402,7 @@ export default function App() {
   };
 
   const handleGenerateImage = async (index: number, prompt: string, overrideReference?: string): Promise<{ image: string, hasCharacter: boolean } | null> => {
+    if (!checkAuth()) return null;
     if (generatingIndices.includes(index)) return null;
     setGeneratingIndices(prev => [...prev, index]);
     setError(null);
@@ -434,6 +447,7 @@ export default function App() {
   };
 
   const handleGenerateAllImages = async () => {
+    if (!checkAuth()) return;
     let currentReference = referenceImage;
     for (let i = 0; i < storyboardSegments.length; i++) {
       const segment = storyboardSegments[i];
@@ -448,6 +462,7 @@ export default function App() {
   };
 
   const playAudio = useCallback(() => {
+    if (!checkAuth()) return;
     if (!audioBuffer || !audioContextRef.current) return;
     if (audioContextRef.current.state === 'suspended') audioContextRef.current.resume();
 
@@ -463,7 +478,7 @@ export default function App() {
     source.start(0);
     sourceNodeRef.current = source;
     setIsPlaying(true);
-  }, [audioBuffer]);
+  }, [audioBuffer, user]);
 
   const stopAudio = useCallback(() => {
     if (sourceNodeRef.current) {
@@ -474,6 +489,7 @@ export default function App() {
   }, []);
 
   const handleDownloadImage = (index: number) => {
+     if (!checkAuth()) return;
      const segment = storyboardSegments[index];
      if (!segment.generatedImage) return;
      const link = document.createElement('a');
@@ -485,6 +501,7 @@ export default function App() {
   };
 
   const handleDownloadAudio = (index: number) => {
+    if (!checkAuth()) return;
     const segment = storyboardSegments[index];
     if (!segment.audio) return;
     const pcmData = decodeBase64(segment.audio);
@@ -500,6 +517,7 @@ export default function App() {
   };
 
   const handleDownloadAllAssets = async () => {
+    if (!checkAuth()) return;
     const zip = new JSZip();
     const folder = zip.folder("storyboard");
     if (!folder) return;
@@ -529,6 +547,7 @@ export default function App() {
   };
 
   const handleExportVideo = async () => {
+    if (!checkAuth()) return;
     const segmentsToRender = storyboardSegments.filter(s => s.generatedImage && s.audio);
     if (segmentsToRender.length === 0) {
       setError("Gere imagens e áudios primeiro.");
@@ -559,7 +578,7 @@ export default function App() {
   };
 
   if (showLanding) {
-    return <LandingPage onEnter={() => setShowLanding(false)} />;
+    return <LandingPage onEnter={enterStudio} />;
   }
 
   return (
