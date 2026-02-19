@@ -650,19 +650,29 @@ export default function App() {
 
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         <div className="flex-1 flex flex-col min-w-0 border-r border-fine bg-[--bg-base]">
-          <header className="h-14 min-h-[56px] border-b border-fine flex items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-              <span className="font-serif italic text-xl">StoryVoice <span className="text-[--accent] text-sm font-sans tracking-widest uppercase ml-1">AI</span></span>
-              <div className="h-6 w-[1px] bg-[#222] mx-2"></div>
-              <div className="flex gap-4">
-                 <button onClick={() => setMode('editor')} className={`text-xs font-mono uppercase ${mode === 'editor' ? 'text-[--accent]' : 'text-[#555]'}`}>Editor</button>
-                 <button onClick={() => setMode('storyboard')} className={`text-xs font-mono uppercase ${mode === 'storyboard' ? 'text-[--accent]' : 'text-[#555]'}`}>Storyboard</button>
+          <header className="h-14 min-h-[56px] border-b border-fine flex items-center justify-between px-4 md:px-6 bg-[--bg-base]">
+            <div className="flex items-center gap-2 md:gap-4">
+              <span className="font-serif italic text-lg md:text-xl">StoryVoice <span className="text-[--accent] text-[10px] md:text-sm font-sans tracking-widest uppercase ml-1">AI</span></span>
+              <div className="h-4 md:h-6 w-[1px] bg-[#222] mx-1 md:mx-2"></div>
+              <div className="flex gap-2 md:gap-4">
+                 <button onClick={() => setMode('editor')} className={`text-[10px] md:text-xs font-mono uppercase ${mode === 'editor' ? 'text-[--accent]' : 'text-[#555]'}`}>Editor</button>
+                 <button onClick={() => setMode('storyboard')} className={`text-[10px] md:text-xs font-mono uppercase ${mode === 'storyboard' ? 'text-[--accent]' : 'text-[#555]'}`}>Storyboard</button>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={openHistory} className="text-[#444] hover:text-[--accent]"><FolderOpen size={16} /></button>
-              <button onClick={() => setShowSettings(true)} className="text-[#444] hover:text-[#ccc]"><Settings size={16} /></button>
-              <button onClick={toggleFullscreen} className="text-[#444] hover:text-[#ccc]">{isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button>
+              <div className="hidden md:flex items-center gap-3">
+                <button onClick={openHistory} className="text-[#444] hover:text-[--accent]"><FolderOpen size={16} /></button>
+                <button onClick={() => setShowSettings(true)} className="text-[#444] hover:text-[#ccc]"><Settings size={16} /></button>
+                <button onClick={toggleFullscreen} className="text-[#444] hover:text-[#ccc]">{isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button>
+              </div>
+
+              <button
+                onClick={() => setShowMobileControls(!showMobileControls)}
+                className="md:hidden text-[--accent] hover:text-white p-2"
+                aria-label="Abrir controles"
+              >
+                <SlidersHorizontal size={20} />
+              </button>
             </div>
           </header>
 
@@ -706,7 +716,27 @@ export default function App() {
           </main>
         </div>
 
-        <aside className="hidden md:flex flex-col w-[360px] bg-[#111] border-l border-fine overflow-y-auto custom-scrollbar">
+        {showMobileControls && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+            onClick={() => setShowMobileControls(false)}
+          ></div>
+        )}
+
+        <aside className={`
+          fixed inset-y-0 right-0 z-50 w-[85vw] max-w-[360px] bg-[#111] border-l border-fine flex flex-col
+          transform transition-transform duration-300 ease-in-out
+          md:relative md:transform-none md:w-[360px] md:flex
+          ${showMobileControls ? 'translate-x-0' : 'translate-x-full'}
+        `}>
+             <div className="flex md:hidden justify-between items-center p-4 border-b border-fine bg-[#111]">
+                <h2 className="text-xs font-mono font-bold uppercase text-[#888]">Controles do Estúdio</h2>
+                <button onClick={() => setShowMobileControls(false)}>
+                  <X size={18} className="text-[#666]" />
+                </button>
+             </div>
+
+             <div className="flex-1 overflow-y-auto custom-scrollbar">
              <Controls
                 onGenerate={handleGenerateAudio}
                 onDownload={handleDownloadMainAudio}
@@ -722,6 +752,28 @@ export default function App() {
                 selectedVisualStyleId={selectedVisualStyleId}
                 onVisualStyleChange={setSelectedVisualStyleId}
              />
+             <div className="md:hidden p-6 border-t border-fine space-y-4">
+               <div className="flex items-center gap-4 text-[#666]">
+                 <button onClick={openHistory} className="flex flex-col items-center gap-1 hover:text-[--accent]">
+                   <FolderOpen size={20} />
+                   <span className="text-[9px] font-mono uppercase">Projetos</span>
+                 </button>
+                 <button onClick={() => setShowSettings(true)} className="flex flex-col items-center gap-1 hover:text-[--accent]">
+                   <Settings size={20} />
+                   <span className="text-[9px] font-mono uppercase">Settings</span>
+                 </button>
+                 <button onClick={toggleFullscreen} className="flex flex-col items-center gap-1 hover:text-[--accent]">
+                   {isFullscreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                   <span className="text-[9px] font-mono uppercase">Tela</span>
+                 </button>
+               </div>
+               {error && (
+                 <div className="text-red-400 text-xs font-mono p-2 border border-red-900/50 bg-red-900/10">
+                   {error}
+                 </div>
+               )}
+             </div>
+           </div>
         </aside>
       </div>
     </div>
