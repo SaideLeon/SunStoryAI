@@ -18,17 +18,8 @@ export interface StoryboardSegment {
   narrativeText: string;
   imagePrompt: string;
   generatedImage?: string;
-  audio?: string; // Base64 audio string specific to this segment
+  audio?: string;
   hasCharacter?: boolean;
-}
-
-export interface ProjectData {
-  id?: string;
-  name: string;
-  text: string;
-  segments: StoryboardSegment[];
-  mode: 'editor' | 'storyboard';
-  updatedAt: string;
 }
 
 export const AVAILABLE_VOICES: VoiceOption[] = [

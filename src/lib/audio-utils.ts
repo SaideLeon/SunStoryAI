@@ -1,7 +1,4 @@
 
-/**
- * Decodes a base64 string into a raw Uint8Array.
- */
 export function decodeBase64(base64: string): Uint8Array {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -12,9 +9,6 @@ export function decodeBase64(base64: string): Uint8Array {
   return bytes;
 }
 
-/**
- * Decodes raw PCM data into an AudioBuffer using the AudioContext.
- */
 export async function decodeAudioData(
   data: Uint8Array,
   ctx: AudioContext,
@@ -34,14 +28,17 @@ export async function decodeAudioData(
   return buffer;
 }
 
-/**
- * Wraps raw PCM data into a valid WAV file blob.
- */
 export function pcmToWav(pcmData: Uint8Array, sampleRate: number = 24000, numChannels: number = 1): Blob {
   const headerLength = 44;
   const dataLength = pcmData.length;
   const buffer = new ArrayBuffer(headerLength + dataLength);
   const view = new DataView(buffer);
+
+  const writeString = (view: DataView, offset: number, string: string) => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  };
 
   writeString(view, 0, 'RIFF');
   view.setUint32(4, 36 + dataLength, true);
@@ -61,10 +58,4 @@ export function pcmToWav(pcmData: Uint8Array, sampleRate: number = 24000, numCha
   pcmBytes.set(pcmData);
 
   return new Blob([buffer], { type: 'audio/wav' });
-}
-
-function writeString(view: DataView, offset: number, string: string) {
-  for (let i = 0; i < string.length; i++) {
-    view.setUint8(offset + i, string.charCodeAt(i));
-  }
 }
