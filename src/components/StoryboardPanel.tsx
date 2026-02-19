@@ -133,6 +133,23 @@ const StoryboardPanel: React.FC<StoryboardPanelProps> = ({
         )}
       </div>
 
+      <div className="md:hidden border-t border-fine bg-[#0f0f0f] p-4 grid grid-cols-2 gap-3">
+        <button
+          onClick={() => goToScene(mobileIndex - 1)}
+          disabled={segments.length === 0 || mobileIndex === 0}
+          className="border border-[#2a2a2a] px-3 py-2 text-[10px] font-mono uppercase tracking-wide text-[#bbb] disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          Anterior
+        </button>
+        <button
+          onClick={() => goToScene(mobileIndex + 1)}
+          disabled={segments.length === 0 || mobileIndex >= segments.length - 1}
+          className="border border-[#2a2a2a] px-3 py-2 text-[10px] font-mono uppercase tracking-wide text-[#bbb] disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          Próximo
+        </button>
+      </div>
+
       <div className="hidden md:block flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
         {segments.map((segment, index) => renderSceneCard(segment, index))}
       </div>
