@@ -69,13 +69,27 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(201,185,154,0.14),transparent_35%)]" />
       </div>
 
-      <nav className="w-full p-8 flex justify-between items-center z-10">
+      <nav className="w-full p-6 md:p-8 flex justify-between items-center z-10">
         <span className="font-serif italic text-2xl text-[--text-main]">
           StoryVoice <span className="text-[--accent] text-sm tracking-widest uppercase ml-1">AI</span>
         </span>
-        <div className="hidden md:flex items-center gap-3 text-[10px] font-mono uppercase tracking-widest text-[#8f8f8f]">
-          <Sparkles size={12} className="text-[--accent]" />
-          IA para creators de conteúdo
+        <div className="flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-3 text-[10px] font-mono uppercase tracking-widest text-[#8f8f8f]">
+            <Sparkles size={12} className="text-[--accent]" />
+            IA para creators de conteúdo
+          </div>
+          <button
+            onClick={onEnter}
+            className="px-4 py-2 border border-fine text-[10px] font-mono uppercase tracking-widest text-[#d0d0d0] hover:bg-[#1a1a1a] transition-colors"
+          >
+            Login
+          </button>
+          <button
+            onClick={onEnter}
+            className="px-4 py-2 bg-[--accent] text-black text-[10px] font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all"
+          >
+            Registro
+          </button>
         </div>
       </nav>
 
