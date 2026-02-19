@@ -57,7 +57,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnter }) => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-[#0c0c0c] text-[#e5e5e5] flex flex-col relative overflow-hidden font-sans [perspective:1200px]">
+    <div className="h-screen w-full bg-[#0c0c0c] text-[#e5e5e5] flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar font-sans [perspective:1200px]">
       <div className="absolute inset-0 pointer-events-none z-0">
         {floatingOrbs.map((orb, index) => (
           <div
