@@ -28,6 +28,7 @@ const ProjectHistoryModal: React.FC<ProjectHistoryModalProps> = ({ isOpen, onClo
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<'list' | 'save'>('list');
   const [isLoading, setIsLoading] = useState(false);
+  const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen && user) loadProjects();
@@ -76,15 +77,20 @@ const ProjectHistoryModal: React.FC<ProjectHistoryModalProps> = ({ isOpen, onClo
     } catch (e: any) { setError("Erro ao atualizar."); } finally { setIsLoading(false); }
   };
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
+  const requestDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!window.confirm("Excluir projeto?")) return;
+    setDeleteProjectId(id);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteProjectId || !user) return;
     setIsLoading(true);
     try {
-      const { error } = await supabase.from('projects').delete().eq('id', id);
+      const { error } = await supabase.from('projects').delete().eq('id', deleteProjectId);
       if (error) throw error;
-      if (currentProjectId === id) onUpdateCurrentId('');
+      if (currentProjectId === deleteProjectId) onUpdateCurrentId('');
       await loadProjects();
+      setDeleteProjectId(null);
     } catch (e: any) { setError("Erro ao excluir."); } finally { setIsLoading(false); }
   };
 
@@ -113,7 +119,7 @@ const ProjectHistoryModal: React.FC<ProjectHistoryModalProps> = ({ isOpen, onClo
             <div className="grid gap-3">
               {projects.map((p) => (
                 <div key={p.id} onClick={() => onLoad({ text: p.text_content, segments: p.segments, mode: p.mode }, p.id)} className={`p-4 border cursor-pointer hover:border-[--accent] ${currentProjectId === p.id ? 'bg-[#1a1a1a] border-[--accent-dim]' : 'bg-[#111] border-[#222]'}`}>
-                  <div className="flex justify-between items-center mb-2"><h3 className="font-serif text-lg">{p.name}</h3><button onClick={(e) => handleDelete(p.id, e)} className="text-[#444] hover:text-red-400"><Trash2 size={14} /></button></div>
+                  <div className="flex justify-between items-center mb-2"><h3 className="font-serif text-lg">{p.name}</h3><button onClick={(e) => requestDelete(p.id, e)} className="text-[#444] hover:text-red-400"><Trash2 size={14} /></button></div>
                   <p className="text-xs text-[#666] italic line-clamp-1">"{p.preview}"</p>
                 </div>
               ))}
@@ -121,6 +127,28 @@ const ProjectHistoryModal: React.FC<ProjectHistoryModalProps> = ({ isOpen, onClo
           )}
         </div>
       </div>
+      {deleteProjectId && (
+        <div className="fixed inset-0 z-[120] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[#141414] border border-[#333] p-5 space-y-4 shadow-2xl">
+            <h3 className="font-mono uppercase text-sm text-[#e5e5e5]">Excluir projeto?</h3>
+            <p className="text-sm text-[#9a9a9a]">Essa ação não pode ser desfeita. O projeto será removido permanentemente.</p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteProjectId(null)}
+                className="px-4 py-2 text-xs font-mono uppercase border border-[#444] bg-[#1f1f1f] text-[#ddd] hover:bg-[#2a2a2a] hover:text-white"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 text-xs font-mono uppercase bg-red-600 text-white hover:bg-red-500"
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
