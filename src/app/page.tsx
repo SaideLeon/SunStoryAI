@@ -335,6 +335,14 @@ export default function App() {
     }
   };
 
+
+  const handleClearGeneratedAudio = () => {
+    if (!checkAuth()) return;
+    stopAudio();
+    setAudioBuffer(null);
+    setAudioBase64(null);
+  };
+
   const handleDownloadMainAudio = () => {
     if (!checkAuth()) return;
     if (!audioBase64) return;
@@ -792,6 +800,7 @@ export default function App() {
                 onDownload={handleDownloadMainAudio}
                 onPlay={playAudio}
                 onStop={stopAudio}
+                onClearAudio={handleClearGeneratedAudio}
                 isPlaying={isPlaying}
                 isGenerating={isGeneratingAudio}
                 hasAudio={!!audioBuffer}

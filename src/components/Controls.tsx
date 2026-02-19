@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Play, Square, Loader2, Volume2, Palette, Command, Download } from 'lucide-react';
+import { Play, Square, Loader2, Download, Trash2 } from 'lucide-react';
 import { AVAILABLE_VOICES, STORY_STYLES, VISUAL_STYLES, VoiceName } from '@/types';
 
 interface ControlsProps {
@@ -10,6 +10,7 @@ interface ControlsProps {
   onDownload: () => void;
   onPlay: () => void;
   onStop: () => void;
+  onClearAudio: () => void;
   isPlaying: boolean;
   isGenerating: boolean;
   hasAudio: boolean;
@@ -22,7 +23,7 @@ interface ControlsProps {
 }
 
 const Controls: React.FC<ControlsProps> = ({
-  onGenerate, onDownload, onPlay, onStop, isPlaying, isGenerating, hasAudio,
+  onGenerate, onDownload, onPlay, onStop, onClearAudio, isPlaying, isGenerating, hasAudio,
   selectedVoice, onVoiceChange, selectedStyleId, onStyleChange, selectedVisualStyleId, onVisualStyleChange
 }) => {
   return (
@@ -54,15 +55,16 @@ const Controls: React.FC<ControlsProps> = ({
           </select>
         </div>
       </div>
-      <div className="mt-auto p-6 bg-[#0c0c0c] border-t border-fine">
+      <div className="mt-auto p-6 bg-[#0c0c0c] border-t border-fine space-y-2">
         {!hasAudio ? (
           <button onClick={onGenerate} disabled={isGenerating} className="w-full py-4 bg-[#e5e5e5] text-black font-mono text-xs uppercase font-bold">{isGenerating ? <Loader2 size={16} className="animate-spin mx-auto" /> : "GERAR NARRAÇÃO"}</button>
         ) : (
-          <div className="space-y-2">
+          <>
              <button onClick={isPlaying ? onStop : onPlay} className="w-full py-4 bg-[--accent] text-black font-mono text-xs font-bold uppercase flex items-center justify-center gap-2">{isPlaying ? <Square fill="currentColor" size={12} /> : <Play fill="currentColor" size={12} />} {isPlaying ? "PARAR" : "TOCAR"}</button>
              <button onClick={onDownload} className="w-full py-3 bg-[#222] text-[#ccc] font-mono text-[10px] uppercase"><Download size={14} className="inline mr-2" /> BAIXAR .WAV</button>
-          </div>
+          </>
         )}
+        <button onClick={onClearAudio} disabled={!hasAudio} className="w-full py-3 border border-[#333] text-[#a3a3a3] enabled:hover:text-white enabled:hover:border-[#555] disabled:opacity-40 disabled:cursor-not-allowed font-mono text-[10px] uppercase transition-colors"><Trash2 size={14} className="inline mr-2" /> LIMPAR ÁUDIO</button>
       </div>
     </div>
   );
