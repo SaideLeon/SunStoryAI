@@ -133,6 +133,57 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
           </a>
         </div>
 
+        <section className="w-full max-w-3xl mb-8 rounded-xl border border-fine bg-[#111]/80 p-4 md:p-5 text-left space-y-4">
+          <h2 className="font-serif text-lg md:text-xl">Como a Resiliência de Cota Funciona no StoryVoice AI</h2>
+
+          <div>
+            <h3 className="text-xs font-mono uppercase tracking-widest text-[#bdbdbd] mb-2">O Sistema de Rotação de Chaves</h3>
+            <p className="text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
+              O app usa um round-robin simples entre múltiplas chaves. A lógica está em
+              <code className="mx-1 text-[#d8c08b]">src/app/page.tsx</code> no método
+              <code className="ml-1 text-[#d8c08b]">getNextKey</code>.
+            </p>
+            <pre className="mt-2 overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code>{`const getNextKey = useCallback(() => {
+  if (apiKeys.length > 0) {
+    const currentIdx = keyIndexRef.current;
+    const key = apiKeys[currentIdx];
+    const nextIdx = (currentIdx + 1) % apiKeys.length;
+    keyIndexRef.current = nextIdx;
+    setKeyIndex(nextIdx);
+    return key;
+  }
+  return undefined;
+}, [apiKeys]);`}</code></pre>
+            <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
+              Em cada geração (áudio, imagem, storyboard), a próxima chave da fila é usada: KEY_1 → KEY_2 →
+              KEY_3 → KEY_1.
+            </p>
+            <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
+              O serviço em <code className="text-[#d8c08b]">src/services/geminiService.ts</code> também aplica retry
+              automático para erros 429 e 503 com backoff exponencial.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-mono uppercase tracking-widest text-[#bdbdbd] mb-2">Como Adicionar Chaves</h3>
+            <p className="text-xs md:text-sm text-[#bfbfbf] leading-relaxed mb-2">
+              <strong>Opção 1 — Arquivo .txt (recomendado):</strong> adicione uma chave por linha e use
+              Configurações (⚙️) → Chaves API → Carregar .txt.
+            </p>
+            <pre className="overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code>{`AIzaSyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AIzaSyBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+AIzaSyCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC`}</code></pre>
+            <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
+              O app filtra automaticamente linhas válidas que começam com <code className="text-[#d8c08b]">AIzaSy</code>
+              e têm mais de 20 caracteres.
+            </p>
+            <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
+              <strong>Opção 2 — Supabase:</strong> se estiver logado, as chaves carregadas podem ser persistidas na
+              tabela <code className="text-[#d8c08b]">user_api_keys</code> e recarregadas nos próximos acessos.
+            </p>
+          </div>
+        </section>
+
         <div
           className="w-full max-w-3xl mb-8 rounded-2xl border border-fine bg-[#111]/70 backdrop-blur-md p-5 md:p-7 transition-transform duration-200"
           style={{
