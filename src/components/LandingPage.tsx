@@ -110,6 +110,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
           storyboard automático e vídeo final. Tudo dentro de um estúdio com foco em escala e velocidade.
         </p>
 
+        <div className="w-full max-w-3xl mb-6 rounded-xl border border-[#3a3222] bg-[#15120a]/80 p-4 text-left">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-[#d6b47a] mb-2">Uso de APIs</p>
+          <p className="text-xs md:text-sm text-[#c7c7c7] leading-relaxed">
+            O StoryVoice AI não oferece API paga padrão. Cada usuário deve configurar suas próprias chaves no
+            Google AI Studio. Texto e áudio podem operar no gratuito (com cotas), enquanto imagens exigem
+            projeto com faturamento ativo. Para maior resiliência, recomendamos múltiplas chaves. APIs
+            de vídeo serão incluídas futuramente, quando houver crédito para testes.
+          </p>
+          <a
+            href="https://aistudio.google.com/api-keys"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-3 text-xs font-mono uppercase tracking-widest text-[--accent] hover:brightness-110"
+          >
+            Criar chaves no Google AI Studio
+          </a>
+        </div>
+
         <div
           className="w-full max-w-3xl mb-8 rounded-2xl border border-fine bg-[#111]/70 backdrop-blur-md p-5 md:p-7 transition-transform duration-200"
           style={{
