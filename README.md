@@ -62,6 +62,16 @@ O projeto estará disponível em `http://localhost:9002`.
 
 ## 📖 Como Usar
 
+## 🔑 Uso de APIs (Importante)
+
+- **Este sistema não possui uma API paga padrão embutida.** Cada usuário deve configurar e manter suas próprias chaves de API.
+- As chaves podem ser criadas no **Google AI Studio**: https://aistudio.google.com/api-keys
+- Atualmente, no ecossistema do Google:
+  - **Geração de texto e áudio** pode ser usada com planos gratuitos (respeitando limites e cotas da conta).
+  - **Geração de imagens** normalmente exige uma conta/projeto com faturamento ativo (APIs pagas).
+- **Resiliência recomendada:** configure **múltiplas chaves** para reduzir falhas por limite de cota, indisponibilidade temporária ou bloqueio de uma chave específica.
+- **Roadmap de vídeo:** haverá suporte a APIs de geração de vídeo no futuro. No momento, essa parte ainda não foi implementada porque é necessário crédito ativo para testar e validar com segurança.
+
 ### Modo Editor
 1. Digite ou cole sua história no editor de texto.
 2. Use o botão **"Script Mágico"** para gerar uma ideia viral.
@@ -76,6 +86,14 @@ O projeto estará disponível em `http://localhost:9002`.
 ### Exportação
 1. Quando todas as cenas tiverem imagem e áudio, o botão **"Exportar Vídeo"** ficará ativo.
 2. O vídeo será renderizado em tempo real no seu navegador.
+
+### Como subir múltiplas chaves (passo a passo)
+1. Crie 2 ou mais chaves no Google AI Studio: https://aistudio.google.com/api-keys
+2. Organize por função (ex.: **KEY_PRIMARIA**, **KEY_BACKUP_1**, **KEY_BACKUP_2**) para facilitar rotação.
+3. Cadastre todas as chaves na aplicação (ou no gerenciamento de chaves do usuário) e defina uma ordem de prioridade.
+4. Em falha de cota/429/5xx, troque automaticamente para a próxima chave (failover), mantendo a anterior em cooldown.
+5. Monitore consumo por chave e faça rotação preventiva antes de lotes longos para reduzir risco de interrupção.
+6. Sempre que possível, use chaves de projetos/contas diferentes para não concentrar toda a operação em um único limite.
 
 ## 📄 Licença
 
