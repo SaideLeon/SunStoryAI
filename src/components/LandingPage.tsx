@@ -47,6 +47,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
+    const canAnimateTilt = window.matchMedia('(pointer: fine)').matches && window.innerWidth >= 768;
+    if (!canAnimateTilt) return;
+
     const onMouseMove = (event: MouseEvent) => {
       const { innerWidth, innerHeight } = window;
       const y = ((event.clientX / innerWidth) * 2 - 1) * 7;
@@ -58,9 +61,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
     return () => window.removeEventListener('mousemove', onMouseMove);
   }, []);
 
+
   return (
-    <div className="h-screen w-full bg-[#0c0c0c] text-[#e5e5e5] flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar font-sans [perspective:1200px]">
-      <div className="absolute inset-0 pointer-events-none z-0">
+      <div
+        className="min-h-screen w-full bg-[#0c0c0c] text-[#e5e5e5] flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar font-sans [perspective:1200px]"
+      >
+        <div className="absolute inset-0 pointer-events-none z-0">
         {floatingOrbs.map((orb, index) => (
           <div
             key={index}
@@ -71,46 +77,46 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.08),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(201,185,154,0.14),transparent_35%)]" />
       </div>
 
-      <nav className="w-full p-6 md:p-8 flex justify-between items-center z-10">
+      <nav className="w-full px-4 py-5 md:p-8 flex flex-wrap justify-between items-center gap-3 z-10">
         <span className="font-serif italic text-2xl text-[--text-main]">
           StoryVoice <span className="text-[--accent] text-sm tracking-widest uppercase ml-1">AI</span>
         </span>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full sm:w-auto items-center justify-end gap-2 sm:gap-3">
           <div className="hidden lg:flex items-center gap-3 text-[10px] font-mono uppercase tracking-widest text-[#8f8f8f]">
             <Sparkles size={12} className="text-[--accent]" />
             IA para creators de conteúdo
           </div>
           <button
             onClick={onLogin}
-            className="px-4 py-2 border border-fine text-[10px] font-mono uppercase tracking-widest text-[#d0d0d0] hover:bg-[#1a1a1a] transition-colors"
+            className="px-3 sm:px-4 py-2 border border-fine text-[10px] font-mono uppercase tracking-widest text-[#d0d0d0] hover:bg-[#1a1a1a] transition-colors"
           >
             Login
           </button>
           <button
             onClick={onRegister}
-            className="px-4 py-2 bg-[--accent] text-black text-[10px] font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all"
+            className="px-3 sm:px-4 py-2 bg-[--accent] text-black text-[10px] font-mono font-bold uppercase tracking-widest hover:brightness-110 transition-all"
           >
             Registro
           </button>
         </div>
       </nav>
 
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-4 z-10 max-w-6xl mx-auto">
+      <main className="flex-1 flex flex-col items-center justify-start md:justify-center text-center px-4 pt-3 pb-8 md:pb-0 z-10 max-w-6xl mx-auto">
         <div className="mb-5 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-fine bg-[#141414]/60 backdrop-blur-md">
           <Sparkles size={12} className="text-[--accent]" />
           <span className="text-[10px] font-mono uppercase text-[#9b9b9b] tracking-widest">Powered by Gemini 2.5</span>
         </div>
 
-        <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-tight mb-5">
+        <h1 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl leading-tight mb-4 md:mb-5">
           Narrativas que <br />
           <span className="italic text-[--accent-dim]">ganham vida.</span>
         </h1>
-        <p className="max-w-2xl text-sm md:text-base text-[#a9a9a9] mb-8">
+        <p className="max-w-2xl text-sm md:text-base text-[#a9a9a9] mb-6 md:mb-8 px-1">
           Transforme uma ideia em conteúdo completo com roteiro dramático, voz cinematográfica,
           storyboard automático e vídeo final. Tudo dentro de um estúdio com foco em escala e velocidade.
         </p>
 
-        <div className="w-full max-w-3xl mb-6 rounded-xl border border-[#3a3222] bg-[#15120a]/80 p-4 text-left">
+        <div className="w-full max-w-3xl mb-6 rounded-xl border border-[#3a3222] bg-[#15120a]/80 p-3 sm:p-4 text-left">
           <p className="text-[11px] font-mono uppercase tracking-widest text-[#d6b47a] mb-2">Uso de APIs</p>
           <p className="text-xs md:text-sm text-[#c7c7c7] leading-relaxed">
             O StoryVoice AI não oferece API paga padrão. Cada usuário deve configurar suas próprias chaves no
@@ -133,27 +139,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
           </a>
         </div>
 
-        <section className="w-full max-w-3xl mb-8 rounded-xl border border-fine bg-[#111]/80 p-4 md:p-5 text-left space-y-4">
+        <section className="w-full max-w-3xl mb-7 md:mb-8 rounded-xl border border-fine bg-[#111]/80 p-3 sm:p-4 md:p-5 text-left space-y-4">
           <h2 className="font-serif text-lg md:text-xl">Como a Resiliência de Cota Funciona no StoryVoice AI</h2>
 
           <div>
             <h3 className="text-xs font-mono uppercase tracking-widest text-[#bdbdbd] mb-2">O Sistema de Rotação de Chaves</h3>
             <p className="text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
-              O app usa um round-robin simples entre múltiplas chaves. A lógica está em
-              <code className="mx-1 text-[#d8c08b]">src/app/page.tsx</code> no método
-              <code className="ml-1 text-[#d8c08b]">getNextKey</code>.
+              O app usa um round-robin simples entre múltiplas chaves para distribuir as gerações entre
+              chave principal e backups automaticamente.
             </p>
-            <pre className="mt-2 overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code>{`const getNextKey = useCallback(() => {
-  if (apiKeys.length > 0) {
-    const currentIdx = keyIndexRef.current;
-    const key = apiKeys[currentIdx];
-    const nextIdx = (currentIdx + 1) % apiKeys.length;
-    keyIndexRef.current = nextIdx;
-    setKeyIndex(nextIdx);
-    return key;
-  }
-  return undefined;
-}, [apiKeys]);`}</code></pre>
             <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
               Em cada geração (áudio, imagem, storyboard), a próxima chave da fila é usada: KEY_1 → KEY_2 →
               KEY_3 → KEY_1.
@@ -170,9 +164,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
               <strong>Opção 1 — Arquivo .txt (recomendado):</strong> adicione uma chave por linha e use
               Configurações (⚙️) → Chaves API → Carregar .txt.
             </p>
-            <pre className="overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code>{`AIzaSyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AIzaSyBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
-AIzaSyCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC`}</code></pre>
             <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
               O app filtra automaticamente linhas válidas que começam com <code className="text-[#d8c08b]">AIzaSy</code>
               e têm mais de 20 caracteres.
@@ -185,9 +176,9 @@ AIzaSyCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC`}</code></pre>
         </section>
 
         <div
-          className="w-full max-w-3xl mb-8 rounded-2xl border border-fine bg-[#111]/70 backdrop-blur-md p-5 md:p-7 transition-transform duration-200"
+          className="w-full max-w-3xl mb-7 md:mb-8 rounded-2xl border border-fine bg-[#111]/70 backdrop-blur-md p-4 md:p-7 transition-transform duration-200"
           style={{
-            transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) translateZ(10px)`,
+            transform: `translateZ(10px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
             transformStyle: 'preserve-3d',
           }}
         >
@@ -212,7 +203,7 @@ AIzaSyCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC`}</code></pre>
 
         <button
           onClick={onEnterStudio}
-          className="group relative px-8 py-4 bg-[--accent] text-black font-mono text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all"
+          className="group relative w-full sm:w-auto px-6 sm:px-8 py-4 bg-[--accent] text-black font-mono text-xs font-bold uppercase tracking-widest hover:brightness-110 transition-all"
         >
           Entrar no Estúdio{' '}
           <ChevronRight size={14} className="inline ml-2 group-hover:translate-x-1 transition-transform" />
@@ -222,14 +213,14 @@ AIzaSyCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC`}</code></pre>
       <div className="w-full border-t border-fine bg-[#0e0e0e]/60 backdrop-blur-md z-10">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x border-fine divide-[#222]">
           {highlights.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="p-8">
+            <div key={title} className="p-5 sm:p-8">
               <Icon className="text-[#6c6c6c] mb-4" size={24} />
               <h3 className="font-serif text-xl mb-2">{title}</h3>
               <p className="text-xs font-mono text-[#8a8a8a] leading-relaxed">{desc}</p>
             </div>
           ))}
         </div>
-        <div className="max-w-6xl mx-auto px-8 pb-6 flex flex-wrap gap-x-6 gap-y-2 text-[10px] font-mono uppercase text-[#6f6f6f] tracking-widest">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 pb-6 flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 text-[10px] font-mono uppercase text-[#6f6f6f] tracking-widest">
           <span className="inline-flex items-center gap-2"><CheckCircle2 size={12} className="text-[--accent]" />Sem watermark</span>
           <span className="inline-flex items-center gap-2"><CheckCircle2 size={12} className="text-[--accent]" />Render para redes sociais</span>
           <span className="inline-flex items-center gap-2"><CheckCircle2 size={12} className="text-[--accent]" />Fluxo guiado por IA</span>
