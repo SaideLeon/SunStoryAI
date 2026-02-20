@@ -14,8 +14,12 @@ const getClient = (apiKey?: string) => {
   return new GoogleGenAI({ apiKey: key });
 };
 
+type RetryConfig = {
+  onRetry?: () => void;
+};
+
 // Retry helper for API calls
-async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
+async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000, config?: RetryConfig): Promise<T> {
   try {
     return await fn();
   } catch (error: any) {
@@ -30,8 +34,9 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Pr
 
     if (retries > 0 && shouldRetry) {
       console.warn(`API call failed with ${errorCode || errorMessage}. Retrying in ${delay}ms...`);
+      config?.onRetry?.();
       await new Promise(resolve => setTimeout(resolve, delay));
-      return withRetry(fn, retries - 1, delay * 2);
+      return withRetry(fn, retries - 1, delay * 2, config);
     }
     throw error;
   }
@@ -41,12 +46,14 @@ export const generateSpeech = async (
   text: string, 
   voice: VoiceName,
   stylePrompt: string,
-  apiKey?: string
+  apiKey?: string,
+  getNextKey?: () => string | undefined
 ): Promise<string | null> => {
-  const ai = getClient(apiKey);
+  let activeKey = apiKey;
 
   return withRetry(async () => {
     try {
+      const ai = getClient(activeKey);
       const effectiveText = stylePrompt 
         ? `${stylePrompt}\n\n${text}`
         : text;
@@ -76,14 +83,19 @@ export const generateSpeech = async (
       console.error("Error generating speech:", error);
       throw error;
     }
+  }, 3, 1000, {
+    onRetry: () => {
+      activeKey = getNextKey?.() || activeKey;
+    }
   });
 };
 
-export const generateStoryboard = async (fullText: string, apiKey?: string): Promise<StoryboardSegment[]> => {
-  const ai = getClient(apiKey);
+export const generateStoryboard = async (fullText: string, apiKey?: string, getNextKey?: () => string | undefined): Promise<StoryboardSegment[]> => {
+  let activeKey = apiKey;
 
   return withRetry(async () => {
     try {
+      const ai = getClient(activeKey);
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: fullText,
@@ -129,11 +141,15 @@ For each scene:
       console.error("Error generating storyboard:", error);
       throw error;
     }
+  }, 3, 1000, {
+    onRetry: () => {
+      activeKey = getNextKey?.() || activeKey;
+    }
   });
 };
 
-export const generateSceneImage = async (prompt: string, referenceImageBase64?: string, apiKey?: string): Promise<string | null> => {
-  const ai = getClient(apiKey);
+export const generateSceneImage = async (prompt: string, referenceImageBase64?: string, apiKey?: string, getNextKey?: () => string | undefined): Promise<string | null> => {
+  let activeKey = apiKey;
 
   return withRetry(async () => {
     const parts: any[] = [];
@@ -157,6 +173,7 @@ export const generateSceneImage = async (prompt: string, referenceImageBase64?: 
     }
 
     try {
+      const ai = getClient(activeKey);
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-image',
         contents: {
@@ -181,19 +198,23 @@ export const generateSceneImage = async (prompt: string, referenceImageBase64?: 
       console.error("Error generating scene image:", error);
       throw error;
     }
+  }, 3, 1000, {
+    onRetry: () => {
+      activeKey = getNextKey?.() || activeKey;
+    }
   });
 };
 
-export const checkImageForCharacter = async (base64Image: string, apiKey?: string): Promise<boolean> => {
+export const checkImageForCharacter = async (base64Image: string, apiKey?: string, getNextKey?: () => string | undefined): Promise<boolean> => {
   if (!apiKey && !ENV_API_KEY) return true;
-
-  const ai = getClient(apiKey);
+  let activeKey = apiKey;
   
   const [header, base64Data] = base64Image.split(',');
   const mimeType = header.match(/:(.*?);/)?.[1] || 'image/png';
 
   return withRetry(async () => {
     try {
+      const ai = getClient(activeKey);
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: {
@@ -216,11 +237,15 @@ export const checkImageForCharacter = async (base64Image: string, apiKey?: strin
       console.error("Error analyzing image for character content:", e);
       return true;
     }
+  }, 3, 1000, {
+    onRetry: () => {
+      activeKey = getNextKey?.() || activeKey;
+    }
   });
 };
 
-export const generateDramaticScript = async (topic: string, apiKey?: string): Promise<string> => {
-  const ai = getClient(apiKey);
+export const generateDramaticScript = async (topic: string, apiKey?: string, getNextKey?: () => string | undefined): Promise<string> => {
+  let activeKey = apiKey;
 
   const systemInstruction = `You are a viral video scriptwriter specializing in "What If" scenarios and dramatic, educational content (like TikTok/Reels/Shorts). 
   
@@ -232,6 +257,7 @@ export const generateDramaticScript = async (topic: string, apiKey?: string): Pr
 
   return withRetry(async () => {
     try {
+      const ai = getClient(activeKey);
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `Input: ${topic}\nOutput:`,
@@ -244,6 +270,10 @@ export const generateDramaticScript = async (topic: string, apiKey?: string): Pr
     } catch (error) {
       console.error("Error generating dramatic script:", error);
       throw error;
+    }
+  }, 3, 1000, {
+    onRetry: () => {
+      activeKey = getNextKey?.() || activeKey;
     }
   });
 };

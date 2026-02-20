@@ -159,8 +159,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
               KEY_3 → KEY_1.
             </p>
             <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
-              O serviço em <code className="text-[#d8c08b]">src/services/geminiService.ts</code> também aplica retry
-              automático para erros 429 e 503 com backoff exponencial.
+              O serviço em <code className="text-[#d8c08b]">src/services/geminiService.ts</code> aplica retry
+              automático para erros 429 e 503 com backoff exponencial e faz failover para a próxima chave a cada nova tentativa.
             </p>
           </div>
 
