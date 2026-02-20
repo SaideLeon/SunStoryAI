@@ -406,7 +406,7 @@ export default function App() {
     try {
       const style = STORY_STYLES.find(s => s.id === selectedStyleId) || STORY_STYLES[0];
       const activeKey = getNextKey();
-      const base64Audio = await generateSpeech(text, selectedVoice, style.prompt, activeKey);
+      const base64Audio = await generateSpeech(text, selectedVoice, style.prompt, activeKey, getNextKey);
       
       if (!base64Audio) throw new Error("Nenhum dado de áudio recebido.");
 
@@ -455,7 +455,7 @@ export default function App() {
 
     try {
       const activeKey = getNextKey();
-      const segments = await generateStoryboard(text, activeKey);
+      const segments = await generateStoryboard(text, activeKey, getNextKey);
       setStoryboardSegments(segments);
       setMode('storyboard');
     } catch (err: any) {
@@ -472,7 +472,7 @@ export default function App() {
     setError(null);
     try {
       const activeKey = getNextKey();
-      const generatedScript = await generateDramaticScript(scriptTopic, activeKey);
+      const generatedScript = await generateDramaticScript(scriptTopic, activeKey, getNextKey);
       setText(generatedScript);
       setShowScriptModal(false);
       setScriptTopic('');
@@ -492,7 +492,7 @@ export default function App() {
     try {
        const style = STORY_STYLES.find(s => s.id === selectedStyleId) || STORY_STYLES[0];
        const activeKey = getNextKey();
-       const base64Audio = await generateSpeech(narrativeText, selectedVoice, style.prompt, activeKey);
+       const base64Audio = await generateSpeech(narrativeText, selectedVoice, style.prompt, activeKey, getNextKey);
 
        if (base64Audio) {
         setStoryboardSegments(prev => {
@@ -533,11 +533,11 @@ export default function App() {
       const visualStyle = VISUAL_STYLES.find(v => v.id === selectedVisualStyleId) || VISUAL_STYLES[0];
       const finalPrompt = `SCENE DESCRIPTION: ${prompt}. \n\nVISUAL STYLE INSTRUCTIONS: ${visualStyle.promptSuffix}`;
       const activeKey = getNextKey();
-      const base64Image = await generateSceneImage(finalPrompt, effectiveReference || undefined, activeKey);
+      const base64Image = await generateSceneImage(finalPrompt, effectiveReference || undefined, activeKey, getNextKey);
       
       if (base64Image) {
         const checkKey = getNextKey();
-        const hasCharacter = await checkImageForCharacter(base64Image, checkKey);
+        const hasCharacter = await checkImageForCharacter(base64Image, checkKey, getNextKey);
         setStoryboardSegments(prev => {
           const newSegments = [...prev];
           newSegments[index] = { ...newSegments[index], generatedImage: base64Image, hasCharacter: hasCharacter };
