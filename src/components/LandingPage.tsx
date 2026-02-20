@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Script from 'next/script';
 import {
   Mic,
   Image as ImageIcon,
@@ -17,6 +18,14 @@ interface LandingPageProps {
   onEnterStudio: () => void;
   onLogin: () => void;
   onRegister: () => void;
+}
+
+declare global {
+  interface Window {
+    hljs?: {
+      highlightElement: (element: HTMLElement) => void;
+    };
+  }
 }
 
 const floatingOrbs = [
@@ -45,6 +54,8 @@ const highlights = [
 
 const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onRegister }) => {
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [highlightReady, setHighlightReady] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onMouseMove = (event: MouseEvent) => {
@@ -58,8 +69,29 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
     return () => window.removeEventListener('mousemove', onMouseMove);
   }, []);
 
+  useEffect(() => {
+    if (!highlightReady || !window.hljs) return;
+
+    pageRef.current
+      ?.querySelectorAll('pre code')
+      .forEach((codeBlock) => window.hljs.highlightElement(codeBlock as HTMLElement));
+  }, [highlightReady]);
+
   return (
-    <div className="h-screen w-full bg-[#0c0c0c] text-[#e5e5e5] flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar font-sans [perspective:1200px]">
+    <>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"
+      />
+      <Script
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"
+        strategy="afterInteractive"
+        onLoad={() => setHighlightReady(true)}
+      />
+      <div
+        ref={pageRef}
+        className="h-screen w-full bg-[#0c0c0c] text-[#e5e5e5] flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar font-sans [perspective:1200px]"
+      >
       <div className="absolute inset-0 pointer-events-none z-0">
         {floatingOrbs.map((orb, index) => (
           <div
@@ -143,7 +175,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
               <code className="mx-1 text-[#d8c08b]">src/app/page.tsx</code> no método
               <code className="ml-1 text-[#d8c08b]">getNextKey</code>.
             </p>
-            <pre className="mt-2 overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code>{`const getNextKey = useCallback(() => {
+            <pre className="mt-2 overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code className="language-typescript">{`const getNextKey = useCallback(() => {
   if (apiKeys.length > 0) {
     const currentIdx = keyIndexRef.current;
     const key = apiKeys[currentIdx];
@@ -170,7 +202,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
               <strong>Opção 1 — Arquivo .txt (recomendado):</strong> adicione uma chave por linha e use
               Configurações (⚙️) → Chaves API → Carregar .txt.
             </p>
-            <pre className="overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code>{`AIzaSyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            <pre className="overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code className="language-plaintext">{`AIzaSyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AIzaSyBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
 AIzaSyCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC`}</code></pre>
             <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
@@ -236,6 +268,7 @@ AIzaSyCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC`}</code></pre>
         </div>
       </div>
     </div>
+    </>
   );
 };
 
