@@ -65,6 +65,94 @@ O tédio não é apenas falta do que fazer.
 Sem o novo, a mente não descansa.
 Ela simplesmente se apaga.`;
 
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const renderInlineMarkdown = (line: string) => {
+  let rendered = escapeHtml(line);
+  rendered = rendered.replace(/`([^`]+)`/g, '<code>$1</code>');
+  rendered = rendered.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  rendered = rendered.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  rendered = rendered.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  return rendered;
+};
+
+const renderMarkdownToHtml = (markdown: string) => {
+  const lines = markdown.split(/\r?\n/);
+  let inList = false;
+  let inCodeBlock = false;
+  const html: string[] = [];
+
+  const closeListIfOpen = () => {
+    if (inList) {
+      html.push('</ul>');
+      inList = false;
+    }
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+
+    if (line.startsWith('```')) {
+      closeListIfOpen();
+      if (!inCodeBlock) {
+        html.push('<pre><code>');
+        inCodeBlock = true;
+      } else {
+        html.push('</code></pre>');
+        inCodeBlock = false;
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      html.push(`${escapeHtml(rawLine)}\n`);
+      continue;
+    }
+
+    if (!line) {
+      closeListIfOpen();
+      continue;
+    }
+
+    const headingMatch = line.match(/^(#{1,6})\s+(.+)/);
+    if (headingMatch) {
+      closeListIfOpen();
+      const level = headingMatch[1].length;
+      html.push(`<h${level}>${renderInlineMarkdown(headingMatch[2])}</h${level}>`);
+      continue;
+    }
+
+    if (line.startsWith('>')) {
+      closeListIfOpen();
+      html.push(`<blockquote>${renderInlineMarkdown(line.replace(/^>\s?/, ''))}</blockquote>`);
+      continue;
+    }
+
+    if (line.match(/^[-*]\s+/)) {
+      if (!inList) {
+        html.push('<ul>');
+        inList = true;
+      }
+      html.push(`<li>${renderInlineMarkdown(line.replace(/^[-*]\s+/, ''))}</li>`);
+      continue;
+    }
+
+    closeListIfOpen();
+    html.push(`<p>${renderInlineMarkdown(line)}</p>`);
+  }
+
+  closeListIfOpen();
+  if (inCodeBlock) html.push('</code></pre>');
+
+  return html.join('');
+};
+
 export default function App() {
   const [showLanding, setShowLanding] = useState(true);
   const [text, setText] = useState<string>(DEFAULT_STORY);
@@ -112,6 +200,7 @@ export default function App() {
   const [showMobileControls, setShowMobileControls] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+  const [editorView, setEditorView] = useState<'write' | 'preview'>('write');
 
   // API Key Management State
   const [apiKeys, setApiKeys] = useState<string[]>([]);
@@ -710,7 +799,13 @@ export default function App() {
         <div className="flex-1 flex flex-col min-w-0 border-r border-fine bg-[--bg-base]">
           <header className="h-14 min-h-[56px] border-b border-fine flex items-center justify-between px-4 md:px-6 bg-[--bg-base]">
             <div className="flex items-center gap-2 md:gap-4">
-              <span className="font-serif italic text-lg md:text-xl">StoryVoice <span className="text-[--accent] text-[10px] md:text-sm font-sans tracking-widest uppercase ml-1">AI</span></span>
+              <button
+                onClick={() => setShowLanding(true)}
+                className="font-serif italic text-lg md:text-xl hover:text-[--accent] transition-colors"
+                aria-label="Voltar para landing page"
+              >
+                StoryVoice <span className="text-[--accent] text-[10px] md:text-sm font-sans tracking-widest uppercase ml-1">AI</span>
+              </button>
               <div className="h-4 md:h-6 w-[1px] bg-[#222] mx-1 md:mx-2"></div>
               <div className="flex gap-2 md:gap-4">
                  <button onClick={() => setMode('editor')} className={`text-[10px] md:text-xs font-mono uppercase ${mode === 'editor' ? 'text-[--accent]' : 'text-[#555]'}`}>Editor</button>
@@ -739,12 +834,33 @@ export default function App() {
               <div className="h-full flex flex-col">
                 <div className="flex-1 relative group/editor overflow-hidden flex flex-col">
                   <button onClick={() => setShowScriptModal(true)} className="absolute top-4 right-8 z-10 bg-[#141414]/80 border border-fine text-[#888] px-3 py-2 text-xs font-mono uppercase">Script Mágico</button>
-                  <textarea
-                    className="flex-1 w-full bg-transparent p-12 text-[#ccc] resize-none outline-none font-serif text-2xl custom-scrollbar"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    placeholder="Sua história começa aqui..."
-                  />
+                  <div className="absolute top-4 left-8 z-10 flex border border-fine bg-[#141414]/80 text-xs font-mono uppercase">
+                    <button
+                      onClick={() => setEditorView('write')}
+                      className={`px-3 py-2 ${editorView === 'write' ? 'text-[--accent]' : 'text-[#888]'}`}
+                    >
+                      Editor
+                    </button>
+                    <button
+                      onClick={() => setEditorView('preview')}
+                      className={`px-3 py-2 border-l border-fine ${editorView === 'preview' ? 'text-[--accent]' : 'text-[#888]'}`}
+                    >
+                      Markdown
+                    </button>
+                  </div>
+                  {editorView === 'write' ? (
+                    <textarea
+                      className="flex-1 w-full bg-transparent p-12 pt-20 text-[#ccc] resize-none outline-none font-serif text-2xl custom-scrollbar"
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      placeholder="Sua história começa aqui..."
+                    />
+                  ) : (
+                    <div
+                      className="markdown-preview flex-1 w-full p-12 pt-20 overflow-y-auto custom-scrollbar"
+                      dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(text) }}
+                    />
+                  )}
                   <div className="absolute bottom-8 right-8">
                      <button onClick={handleGenerateStoryboard} disabled={isGeneratingStoryboard} className="bg-[#141414] border border-fine px-6 py-3 flex items-center gap-3 font-mono text-xs uppercase tracking-wider">
                         {isGeneratingStoryboard ? <Loader2 size={16} className="animate-spin" /> : <LayoutList size={16} />} Storyboard
