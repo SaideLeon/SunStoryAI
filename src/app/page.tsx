@@ -799,7 +799,13 @@ export default function App() {
         <div className="flex-1 flex flex-col min-w-0 border-r border-fine bg-[--bg-base]">
           <header className="h-14 min-h-[56px] border-b border-fine flex items-center justify-between px-4 md:px-6 bg-[--bg-base]">
             <div className="flex items-center gap-2 md:gap-4">
-              <span className="font-serif italic text-lg md:text-xl">StoryVoice <span className="text-[--accent] text-[10px] md:text-sm font-sans tracking-widest uppercase ml-1">AI</span></span>
+              <button
+                onClick={() => setShowLanding(true)}
+                className="font-serif italic text-lg md:text-xl hover:text-[--accent] transition-colors"
+                aria-label="Voltar para landing page"
+              >
+                StoryVoice <span className="text-[--accent] text-[10px] md:text-sm font-sans tracking-widest uppercase ml-1">AI</span>
+              </button>
               <div className="h-4 md:h-6 w-[1px] bg-[#222] mx-1 md:mx-2"></div>
               <div className="flex gap-2 md:gap-4">
                  <button onClick={() => setMode('editor')} className={`text-[10px] md:text-xs font-mono uppercase ${mode === 'editor' ? 'text-[--accent]' : 'text-[#555]'}`}>Editor</button>
