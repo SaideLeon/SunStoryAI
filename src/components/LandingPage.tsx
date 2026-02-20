@@ -72,27 +72,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
     return () => window.removeEventListener('mousemove', onMouseMove);
   }, []);
 
-  useEffect(() => {
-    if (!highlightReady || !window.hljs) return;
-
-    pageRef.current
-      ?.querySelectorAll('pre code')
-      .forEach((codeBlock) => window.hljs.highlightElement(codeBlock as HTMLElement));
-  }, [highlightReady]);
 
   return (
-    <>
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"
-      />
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"
-        strategy="afterInteractive"
-        onLoad={() => setHighlightReady(true)}
-      />
       <div
-        ref={pageRef}
         className="min-h-screen w-full bg-[#0c0c0c] text-[#e5e5e5] flex flex-col relative overflow-y-auto overflow-x-hidden custom-scrollbar font-sans [perspective:1200px]"
       >
         <div className="absolute inset-0 pointer-events-none z-0">
@@ -174,21 +156,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
           <div>
             <h3 className="text-xs font-mono uppercase tracking-widest text-[#bdbdbd] mb-2">O Sistema de Rotação de Chaves</h3>
             <p className="text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
-              O app usa um round-robin simples entre múltiplas chaves. A lógica está em
-              <code className="mx-1 text-[#d8c08b]">src/app/page.tsx</code> no método
-              <code className="ml-1 text-[#d8c08b]">getNextKey</code>.
+              O app usa um round-robin simples entre múltiplas chaves para distribuir as gerações entre
+              chave principal e backups automaticamente.
             </p>
-            <pre className="mt-2 overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code className="language-typescript">{`const getNextKey = useCallback(() => {
-  if (apiKeys.length > 0) {
-    const currentIdx = keyIndexRef.current;
-    const key = apiKeys[currentIdx];
-    const nextIdx = (currentIdx + 1) % apiKeys.length;
-    keyIndexRef.current = nextIdx;
-    setKeyIndex(nextIdx);
-    return key;
-  }
-  return undefined;
-}, [apiKeys]);`}</code></pre>
             <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
               Em cada geração (áudio, imagem, storyboard), a próxima chave da fila é usada: KEY_1 → KEY_2 →
               KEY_3 → KEY_1.
@@ -205,9 +175,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
               <strong>Opção 1 — Arquivo .txt (recomendado):</strong> adicione uma chave por linha e use
               Configurações (⚙️) → Chaves API → Carregar .txt.
             </p>
-            <pre className="overflow-x-auto rounded-md bg-[#0d0d0d] border border-fine p-3 text-[11px] md:text-xs text-[#cfcfcf]"><code className="language-plaintext">{`AIzaSyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AIzaSyBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
-AIzaSyCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC`}</code></pre>
             <p className="mt-2 text-xs md:text-sm text-[#bfbfbf] leading-relaxed">
               O app filtra automaticamente linhas válidas que começam com <code className="text-[#d8c08b]">AIzaSy</code>
               e têm mais de 20 caracteres.
