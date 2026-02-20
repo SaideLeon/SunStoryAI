@@ -81,3 +81,69 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
+
+
+.markdown-preview {
+  color: var(--text-main);
+  line-height: 1.8;
+  font-family: 'Crimson Pro', serif;
+  font-size: 1.5rem;
+}
+
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4,
+.markdown-preview h5,
+.markdown-preview h6 {
+  color: #fff;
+  font-weight: 700;
+  margin: 1.2rem 0 0.8rem;
+  line-height: 1.2;
+}
+
+.markdown-preview p,
+.markdown-preview blockquote,
+.markdown-preview ul,
+.markdown-preview pre {
+  margin-bottom: 1rem;
+}
+
+.markdown-preview ul {
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.markdown-preview blockquote {
+  border-left: 2px solid var(--accent-dim);
+  padding-left: 1rem;
+  color: #bcbcbc;
+}
+
+.markdown-preview code {
+  background: #1a1a1a;
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  padding: 0.05rem 0.35rem;
+  font-family: 'DM Mono', monospace;
+}
+
+.markdown-preview pre {
+  background: #111;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+}
+
+.markdown-preview pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.markdown-preview a {
+  color: var(--accent);
+  text-decoration: underline;
+}
