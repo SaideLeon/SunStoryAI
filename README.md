@@ -87,11 +87,13 @@ O projeto estará disponível em `http://localhost:9002`.
 1. Quando todas as cenas tiverem imagem e áudio, o botão **"Exportar Vídeo"** ficará ativo.
 2. O vídeo será renderizado em tempo real no seu navegador.
 
-### Configuração sugerida de chaves
-1. Gere suas chaves no Google AI Studio: https://aistudio.google.com/api-keys
-2. Adicione uma chave principal na aplicação.
-3. Se possível, cadastre chaves de backup (contas/projetos diferentes) para failover.
-4. Monitore cotas e limites para evitar interrupções durante geração em lote.
+### Como subir múltiplas chaves (passo a passo)
+1. Crie 2 ou mais chaves no Google AI Studio: https://aistudio.google.com/api-keys
+2. Organize por função (ex.: **KEY_PRIMARIA**, **KEY_BACKUP_1**, **KEY_BACKUP_2**) para facilitar rotação.
+3. Cadastre todas as chaves na aplicação (ou no gerenciamento de chaves do usuário) e defina uma ordem de prioridade.
+4. Em falha de cota/429/5xx, troque automaticamente para a próxima chave (failover), mantendo a anterior em cooldown.
+5. Monitore consumo por chave e faça rotação preventiva antes de lotes longos para reduzir risco de interrupção.
+6. Sempre que possível, use chaves de projetos/contas diferentes para não concentrar toda a operação em um único limite.
 
 ## 📄 Licença
 

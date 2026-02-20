@@ -118,6 +118,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
             projeto com faturamento ativo. Para maior resiliência, recomendamos múltiplas chaves. APIs
             de vídeo serão incluídas futuramente, quando houver crédito para testes.
           </p>
+          <ul className="mt-3 space-y-1 text-[11px] md:text-xs text-[#b5b5b5] list-disc pl-4">
+            <li>Crie 2+ chaves no AI Studio.</li>
+            <li>Cadastre como principal + backups.</li>
+            <li>Quando uma chave bater limite, troque para a próxima.</li>
+          </ul>
           <a
             href="https://aistudio.google.com/api-keys"
             target="_blank"
