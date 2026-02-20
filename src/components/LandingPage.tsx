@@ -238,7 +238,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
         </div>
       </div>
     </div>
-    </>
   );
 };
 
