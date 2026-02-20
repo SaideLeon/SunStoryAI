@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Script from 'next/script';
 import {
   Mic,
   Image as ImageIcon,
@@ -17,6 +18,14 @@ interface LandingPageProps {
   onEnterStudio: () => void;
   onLogin: () => void;
   onRegister: () => void;
+}
+
+declare global {
+  interface Window {
+    hljs?: {
+      highlightElement: (element: HTMLElement) => void;
+    };
+  }
 }
 
 const floatingOrbs = [
@@ -45,6 +54,8 @@ const highlights = [
 
 const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onRegister }) => {
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [highlightReady, setHighlightReady] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const canAnimateTilt = window.matchMedia('(pointer: fine)').matches && window.innerWidth >= 768;
@@ -227,6 +238,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onEnterStudio, onLogin, onReg
         </div>
       </div>
     </div>
+    </>
   );
 };
 
